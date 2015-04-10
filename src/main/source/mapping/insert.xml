@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap     
+    PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"     
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="Insert">
+		<typeAlias alias="invpage" type="com.valueclickbrands.solr.model.Invpage"/>
+	<typeAlias alias="contentType" type="com.valueclickbrands.solr.model.ContentType"/>
+	<typeAlias alias="website" type="com.valueclickbrands.solr.model.Website"/>
+	<typeAlias alias="channel" type="com.valueclickbrands.solr.model.Channel"/>
+	<typeAlias alias="invTag" type="com.valueclickbrands.solr.model.InvTag"/>
+	<typeAlias alias="lucrativeness" type="com.valueclickbrands.solr.model.Lucrativeness"/>
+	<typeAlias alias="timelessness" type="com.valueclickbrands.solr.model.Timelessness"/>
+	<typeAlias alias="interestLevel" type="com.valueclickbrands.solr.model.InterestLevel"/>
+	<typeAlias alias="advertising" type="com.valueclickbrands.solr.model.Advertising"/>
+	<typeAlias alias="adtarget" type="com.valueclickbrands.solr.model.Adtarget"/>
+	<typeAlias alias="master" type="com.valueclickbrands.solr.model.Master"/>
+	<typeAlias alias="noindexparams" type="com.valueclickbrands.solr.model.Noindexparams"/>
+	<typeAlias alias="InvUrlAlias" type="com.valueclickbrands.solr.model.InvUrlAlias"/>
+	<typeAlias alias="metatag" type="com.valueclickbrands.solr.model.Metatag"/>
+	
+	
+	
+	<select id="checkInvpageByTitle" resultClass="int" parameterClass="invpage">
+		select count(title) from devel_invpage where title=#title# and owner=#owner#
+	</select>
+	
+	<insert id="insertInvpage" parameterClass="invpage">
+		INSERT INTO devel_invpage (type,language,title,owner,uid,status,created,changed,data)
+		VALUES(#type#, #language#, #title#, #owner#, #uid#,#status#, #created#, #changed#, #data#)
+		<selectKey keyProperty="pid" resultClass="long">
+			SELECT LAST_INSERT_ID()
+		</selectKey>
+	</insert>
+	
+	<insert id="insertDataContentType" parameterClass="contentType">
+		INSERT INTO devel_field_data_field_page_content_type (entity_type, bundle, deleted, entity_id, revision_id, language, delta, field_page_content_type_tid)
+		VALUES (#entity_type#, #bundle#, #deleted#, #entity_id#, #revision_id#, #language#, #delta#, #field_page_content_type_tid#)
+	</insert>
+	<insert id="insertRevisionContentType" parameterClass="contentType">
+		INSERT INTO devel_field_revision_field_page_content_type (entity_type, bundle, deleted, entity_id, revision_id, language, delta, field_page_content_type_tid)
+		VALUES (#entity_type#, #bundle#, #deleted#, #entity_id#, #revision_id#, #language#, #delta#, #field_page_content_type_tid#)
+	</insert>
+	
+	<insert id="insertDataWebsite" parameterClass="website">
+		INSERT INTO devel_field_data_field_page_website(entity_type, bundle, deleted, entity_id, revision_id, language, delta, field_page_website_value)
+		VALUES (#entity_type#, #bundle#, #deleted#, #entity_id#, #revision_id#, #language#, #delta#, #field_page_website_value#)
+	</insert>
+	<insert id="insertRevisionWebsite" parameterClass="website">
+		INSERT INTO devel_field_revision_field_page_website(entity_type, bundle, deleted, entity_id, revision_id, language, delta, field_page_website_value)
+		VALUES (#entity_type#, #bundle#, #deleted#, #entity_id#, #revision_id#, #language#, #delta#, #field_page_website_value#)
+	</insert>
+	
+	<insert id="insertDataChannel" parameterClass="channel">
+		INSERT INTO devel_field_data_field_page_channel (entity_type, bundle, deleted, entity_id, revision_id, language, delta, field_page_channel_tid)
+		VALUES (#entity_type#, #bundle#, #deleted#, #entity_id#, #revision_id#, #language#, #delta#, #field_page_channel_tid#)
+	</insert>
+	<insert id="insertRevisionChannel" parameterClass="channel">
+		INSERT INTO devel_field_revision_field_page_channel (entity_type, bundle, deleted, entity_id, revision_id, language, delta, field_page_channel_tid)
+		VALUES (#entity_type#, #bundle#, #deleted#, #entity_id#, #revision_id#, #language#, #delta#, #field_page_channel_tid#)
+	</insert>
+	
+	<insert id="insertDataTag" parameterClass="InvTag">
+		INSERT INTO devel_field_data_field_page_tags (entity_type, bundle, deleted, entity_id, revision_id, language, delta, field_page_tags_tid)
+		VALUES (#entity_type#, #bundle#, #deleted#, #entity_id#, #revision_id#, #language#, #delta#, #field_page_tags_tid#)
+	</insert>
+	<insert id="insertRevisionTag" parameterClass="InvTag">
+		INSERT INTO devel_field_revision_field_page_tags (entity_type, bundle, deleted, entity_id, revision_id, language, delta, field_page_tags_tid)
+		VALUES (#entity_type#, #bundle#, #deleted#, #entity_id#, #revision_id#, #language#, #delta#, #field_page_tags_tid#)
+	</insert>
+	
+	
+	<insert id="insertDataTimelessness" parameterClass="timelessness">
+		INSERT INTO devel_field_data_field_page_timelessness (entity_type, bundle, deleted, entity_id, revision_id, language, delta, field_page_timelessness_tid)
+		VALUES (#entity_type#, #bundle#, #deleted#, #entity_id#, #revision_id#, #language#, #delta#, #field_page_timelessness_tid#)
+	</insert>
+	<insert id="insertRevisionTimelessness" parameterClass="timelessness">
+		INSERT INTO devel_field_revision_field_page_timelessness (entity_type, bundle, deleted, entity_id, revision_id, language, delta, field_page_timelessness_tid)
+		VALUES (#entity_type#, #bundle#, #deleted#, #entity_id#, #revision_id#, #language#, #delta#, #field_page_timelessness_tid#)
+	</insert>
+	
+	<insert id="insertDataInterestLevel" parameterClass="interestLevel">
+		INSERT INTO devel_field_data_field_page_interest_level (entity_type, bundle, deleted, entity_id, revision_id, language, delta, field_page_interest_level_tid)
+		VALUES (#entity_type#, #bundle#, #deleted#, #entity_id#, #revision_id#, #language#, #delta#, #field_page_interest_level_tid#)
+	</insert>
+	<insert id="insertRevisionInterestLevel" parameterClass="interestLevel">
+		INSERT INTO devel_field_revision_field_page_interest_level (entity_type, bundle, deleted, entity_id, revision_id, language, delta, field_page_interest_level_tid)
+		VALUES (#entity_type#, #bundle#, #deleted#, #entity_id#, #revision_id#, #language#, #delta#, #field_page_interest_level_tid#)
+	</insert>
+	
+	<insert id="insertDataAdvertising" parameterClass="advertising">
+		INSERT INTO devel_field_data_field_page_advertising (entity_type, bundle, deleted, entity_id, revision_id, language, delta, field_page_advertising_tid)
+		VALUES (#entity_type#, #bundle#, #deleted#, #entity_id#, #revision_id#, #language#, #delta#, #field_page_advertising_tid#)
+	</insert>
+	<insert id="insertRevisionAdvertising" parameterClass="advertising">
+		INSERT INTO devel_field_revision_field_page_advertising (entity_type, bundle, deleted, entity_id, revision_id, language, delta, field_page_advertising_tid)
+		VALUES (#entity_type#, #bundle#, #deleted#, #entity_id#, #revision_id#, #language#, #delta#, #field_page_advertising_tid#)
+	</insert>
+	
+	<insert id="insertDataAdtarget" parameterClass="adtarget">
+		INSERT INTO devel_field_data_field_page_adtarget (entity_type, bundle, deleted, entity_id, revision_id, language, delta, field_page_adtarget_value)
+		VALUES (#entity_type#, #bundle#, #deleted#, #entity_id#, #revision_id#, #language#, #delta#, #field_page_adtarget_value#)
+	</insert>
+	<insert id="insertRevisionAdtarget" parameterClass="adtarget">
+		INSERT INTO devel_field_revision_field_page_adtarget (entity_type, bundle, deleted, entity_id, revision_id, language, delta, field_page_adtarget_value)
+		VALUES (#entity_type#, #bundle#, #deleted#, #entity_id#, #revision_id#, #language#, #delta#, #field_page_adtarget_value#)
+	</insert>
+	
+	<insert id="insertDataMaster" parameterClass="master">
+		INSERT INTO devel_field_data_field_page_master (entity_type, bundle, deleted, entity_id, revision_id, language, delta, field_page_master_value)
+		VALUES (#entity_type#, #bundle#, #deleted#, #entity_id#, #revision_id#, #language#, #delta#, #field_page_master_value#)
+	</insert>
+	<insert id="insertRevisionMaster" parameterClass="master">
+		INSERT INTO devel_field_revision_field_page_master (entity_type, bundle, deleted, entity_id, revision_id, language, delta, field_page_master_value)
+		VALUES (#entity_type#, #bundle#, #deleted#, #entity_id#, #revision_id#, #language#, #delta#, #field_page_master_value#)
+	</insert>
+	
+	<insert id="insertDataNoindexparams" parameterClass="noindexparams">
+		INSERT INTO devel_field_data_field_page_noindexparams (entity_type, bundle, deleted, entity_id, revision_id, language, delta, field_page_noindexparams_value)
+		VALUES (#entity_type#, #bundle#, #deleted#, #entity_id#, #revision_id#, #language#, #delta#, #field_page_noindexparams_value#)
+	</insert>
+	<insert id="insertRevisionNoindexparams" parameterClass="noindexparams">
+		INSERT INTO devel_field_revision_field_page_noindexparams (entity_type, bundle, deleted, entity_id, revision_id, language, delta, field_page_noindexparams_value)
+		VALUES (#entity_type#, #bundle#, #deleted#, #entity_id#, #revision_id#, #language#, #delta#, #field_page_noindexparams_value#)
+	</insert>
+	
+	<insert id="insertUrlAlias" parameterClass="InvUrlAlias">
+		INSERT INTO devel_url_alias (source,alias,language)
+		VALUES (#source#, #alias#, #language#)
+	</insert>
+	
+	<delete id="deleteMetatag" parameterClass="metatag">
+		DELETE FROM devel_metatag 
+		WHERE  (entity_type = #entity_type#) AND (entity_id = #entity_id#)
+	</delete>
+	<insert id="insertMetatag" parameterClass="metatag">
+		INSERT INTO devel_metatag (entity_type, entity_id, data)
+		VALUES (#entity_type#, #entity_id#, #data#)
+	</insert>
+	
+	
+	<select id="selectUrlAliasCount" resultClass="int" parameterClass="InvUrlAlias">
+		SELECT count(*) FROM devel_url_alias WHERE alias=#alias#
+	</select>
+	
+	<select id="selectTableUrl_domainCount" resultClass="int">
+		SELECT COUNT(*) FROM devel_url_domain
+	</select>
+	
+	<select id="selectTableTaxonomy_term_dataCount" resultClass="int">
+		SELECT COUNT(*) FROM  devel_taxonomy_term_data c LEFT JOIN devel_taxonomy_term_hierarchy a  ON (a.tid=c.tid) LEFT JOIN devel_taxonomy_term_data b ON (a.parent=b.tid)
+	</select>
+	
+	
+</sqlMap>

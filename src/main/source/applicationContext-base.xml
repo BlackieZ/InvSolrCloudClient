@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
+        xmlns:context="http://www.springframework.org/schema/context"
+        xmlns:aop="http://www.springframework.org/schema/aop" xmlns:tx="http://www.springframework.org/schema/tx"
+        xmlns:hz="http://www.hazelcast.com/schema/spring"
+        xsi:schemaLocation="http://www.springframework.org/schema/beans
+      http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+      http://www.springframework.org/schema/context
+      http://www.springframework.org/schema/context/spring-context-3.0.xsd
+      http://www.springframework.org/schema/tx
+      http://www.springframework.org/schema/tx/spring-tx-3.0.xsd
+      http://www.springframework.org/schema/aop
+      http://www.springframework.org/schema/aop/spring-aop-3.0.xsd
+      http://www.hazelcast.com/schema/spring
+      http://www.hazelcast.com/schema/spring/hazelcast-spring-2.3.xsd">
+      
+    <bean id="propertyConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+        <property name="locations">
+            <list>
+                <value>classpath:jdbc.properties</value>
+                <value>classpath:config.properties</value>
+            </list>
+        </property>
+    </bean>
+    
+    <bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource">
+                <property name="driverClass" value="${jdbc.driver}" />
+                <property name="jdbcUrl" value="${jdbc.url}" />
+                <property name="user" value="${jdbc.user}" />
+                <property name="password" value="${jdbc.pwd}" />
+                <property name="initialPoolSize" value="1" />
+                <property name="minPoolSize" value="1" />
+                <property name="maxPoolSize" value="5" />
+                <property name="acquireIncrement" value="1" />
+                <property name="maxIdleTime" value="10" />
+                <property name="maxStatements" value="0" />
+                <property name="idleConnectionTestPeriod" value="60" />
+                <property name="preferredTestQuery" value="${jdbc.validationQuery}" />
+        </bean>
+
+    <bean id="lobHandler" class="org.springframework.jdbc.support.lob.DefaultLobHandler" />
+
+        <bean id="sqlMapClient" class="org.springframework.orm.ibatis.SqlMapClientFactoryBean">
+                <property name="configLocation">
+                        <value>classpath:SqlMapConfig.xml</value>
+                </property>
+                <property name="dataSource">
+                        <ref bean="dataSource" />
+                </property>
+                <property name="lobHandler">
+                        <ref bean="lobHandler"/>
+                </property>
+        </bean>
+        
+        <bean id="Configure" class="com.valueclickbrands.solr.util.Configure" init-method="init">
+        </bean>
+
+        <bean id="basicDao" class="com.valueclickbrands.framework.db.IbatisGenericDao" abstract="true">
+                <property name="sqlMapClient" ref="sqlMapClient" />
+        </bean>
+
+        <bean id="DumpDao" class="com.valueclickbrands.solr.dao.impl.DumpDaoImpl" parent="basicDao" />
+        
+        <bean id="TaxonomyInsertDao" class="com.valueclickbrands.solr.dao.impl.TaxonomyInsertDaoImpl" parent="basicDao" />
+
+        <bean id="DumpService" class="com.valueclickbrands.solr.service.DumpService">
+            <property name="DumpDao" ref="DumpDao" />
+            <!-->property name="dumpFilePath" value="${dump_path_1}" /  -->
+        </bean>
+        
+         <bean id="TaxonomyService" class="com.valueclickbrands.solr.service.TaxonomyService">
+            <property name="DumpDao" ref="DumpDao" />
+            <property name="taxonomyInsertDao" ref="TaxonomyInsertDao" />
+        </bean>
+       
+    	 <bean id="IndexService" class="com.valueclickbrands.solr.service.IndexService">
+    	     <property name="dumpService" ref="DumpService" />
+    	 	 <property name="taxonomyService" ref="TaxonomyService" />
+        </bean>
+        
+        <!-- bean id="SearchServlet" class="com.valueclickbrands.solr.servlet.TestServlet">
+            <property name="search" ref="SearchService" />
+        </bean> -->
+      
+        <bean id="CacheUtil" class="com.valueclickbrands.solr.util.CacheUtil">
+        </bean>
+        
+        <bean id="zkService" class="com.valueclickbrands.solr.service.ZKService">
+    	     <constructor-arg value="${zookeeper.hosts}" />
+    	     <constructor-arg value="" />
+    	     <constructor-arg value="${zookeeper.queue.path}" />
+        </bean>
+        
+        <bean id="taskService" class="com.valueclickbrands.solr.service.TaskService">
+    	     <property name="indexService" ref="IndexService" />
+    	     <property name="zkService" ref="zkService" />
+        </bean>
+        
+        <bean id="serviceMain" class="com.valueclickbrands.solr.service.ServiceMain">
+            <constructor-arg ref="zkService" />
+    	    <property name="taskService" ref="taskService" />
+        </bean>
+        
+        <bean id="watcher" class="com.valueclickbrands.zookeeper.service.ZKWatch">
+        	<constructor-arg ref="zkService" />
+    	    <property name="serviceMain" ref="serviceMain" />
+        </bean>
+</beans>

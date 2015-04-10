@@ -1,0 +1,498 @@
+package com.valueclickbrands.solr.service;
+
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
+import net.sf.json.JSONObject;
+
+import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Logger;
+import org.apache.solr.client.solrj.SolrQuery;
+import org.apache.solr.client.solrj.SolrRequest;
+import org.apache.solr.client.solrj.SolrServer;
+import org.apache.solr.client.solrj.SolrServerException;
+import org.apache.solr.client.solrj.impl.CloudSolrServer;
+import org.apache.solr.client.solrj.impl.LBHttpSolrServer;
+import org.apache.solr.client.solrj.response.QueryResponse;
+import org.apache.solr.client.solrj.response.UpdateResponse;
+import org.apache.solr.common.SolrDocument;
+import org.apache.solr.common.SolrDocumentList;
+import org.apache.solr.common.SolrInputDocument;
+
+import com.google.gson.Gson;
+import com.valueclickbrands.solr.model.Node;
+import com.valueclickbrands.solr.model.ResponseHeader;
+import com.valueclickbrands.solr.model.Taxonomy;
+import com.valueclickbrands.solr.util.Configure;
+import com.valueclickbrands.solr.util.DataConvertor;
+import com.valueclickbrands.solr.util.Http;
+
+/** 
+ * @author Vanson Zou
+ * @date Dec 18, 2014 
+ */
+
+public class IndexService {
+	protected static Logger logger = Logger.getLogger(IndexService.class);
+
+	 private static CloudSolrServer cloudSolrServer; 
+	 private static int commitCount;
+	 private DumpService dumpService;
+	 private ZKService zkService;
+	 private Gson gson = new Gson();
+	 
+	 
+	 public static int getCommitCount() {
+		return commitCount;
+	}
+
+	public static void setCommitCount(int commitCount) {
+		IndexService.commitCount = commitCount;
+	}
+
+	public void setDumpService(DumpService dumpService) {
+		this.dumpService = dumpService;
+	}
+
+	public void setZkService(ZKService zkService) {
+		this.zkService = zkService;
+	}
+
+	public void setGson(Gson gson) {
+		this.gson = gson;
+	}
+
+
+	public static synchronized CloudSolrServer getCloudSolrServer(final String zkHost,String defaultCollection) {  
+	
+		try {
+			if (cloudSolrServer == null) {
+		        cloudSolrServer = new CloudSolrServer(zkHost);
+	            cloudSolrServer.setDefaultCollection(defaultCollection);
+			    cloudSolrServer.connect();
+			} else {
+				cloudSolrServer.setDefaultCollection(defaultCollection);
+			}
+        }catch(Exception e) {  
+            e.printStackTrace();
+            logger.error(e.getMessage());
+        }  
+	        return cloudSolrServer;  
+	    }  
+	 
+	 
+	      
+	    public void search(SolrServer solrServer, String String) {        
+	        SolrQuery query = new SolrQuery();  
+	        query.setQuery(String);  
+	        try {  
+	            QueryResponse response = solrServer.query(query);  
+	            SolrDocumentList docs = response.getResults();  
+	  
+	            System.out.println("文档个数：" + docs.getNumFound());  
+	            System.out.println("查询时间：" + response.getQTime());  
+	  
+	            for (SolrDocument doc : docs) {  
+	                String area = (String) doc.getFieldValue("area");  
+	                Long id = (Long) doc.getFieldValue("id");  
+	                System.out.println("id: " + id);  
+	                System.out.println("area: " + area);  
+	                System.out.println();  
+	            }  
+	        } catch (SolrServerException e) {  
+	            e.printStackTrace();  
+	        } catch(Exception e) {  
+	            System.out.println("Unknowned Exception!!!!");  
+	            e.printStackTrace();  
+	        }  
+	    }  
+	      
+	    public boolean deleteAllIndex(SolrServer solrServer) {  
+	    	boolean success = false;
+	        try {  
+	            solrServer.deleteByQuery("*:*");// delete everything!  
+	            UpdateResponse ups=  solrServer.commit();  
+	            if(ups.getStatus() ==0){
+	            	success = true;
+	            }
+	        }catch(SolrServerException e){  
+	            e.printStackTrace();  
+	        }catch(IOException e) {  
+	            e.printStackTrace();  
+	        }catch(Exception e) {  
+	            e.printStackTrace();  
+	        }  
+	        return success;
+	    }
+	    
+	    public boolean switchIndex(String collectionName,String hostname){
+	    	boolean re = false;
+	    	String url = Configure.SolrCollectionUrlCreatealiasUrl;
+	    	String name = Configure.SolrCollectionEnv;
+	    	url = url.replace("[hostname]", hostname)+"&name="+name+"&collections="+collectionName;	
+	    	logger.info("Solr Collection Url Createalias url :"+url);
+	    	String response = Http.sendRequest(url);
+	    	ResponseHeader responseHeader = gson.fromJson(response, ResponseHeader.class);
+	    	if(responseHeader.getStatus() == 0){
+	    		re = true;
+	    	}else {
+				
+			}
+	    	return re;
+	    }
+	    
+	    public boolean createIndexIncrementalForNode(int nid,int vid){
+	    	boolean re = false;
+	    	Map<String, Node> node_map = dumpService.dumpIncremental(nid, vid);
+	    	String c1 = getCollection(false);
+			if(node_map.size()>0 && !StringUtils.isEmpty(c1) ){
+				CloudSolrServer cloudSolrServer = getCloudSolrServer(Configure.ZookeeperHosts, c1);    
+				int count =  createIndexForNode(cloudSolrServer,node_map,false);
+				if(count >0){
+					logger.info("index Incremental success ,nid:"+nid+",vid:"+vid);
+					re = true;
+				}
+			 }else {
+				logger.info(" create index failed node_map size =0 ,nid="+nid+",vid="+vid);
+			}
+	    	return re;
+	    }
+	    
+	    public boolean deleteIndexForNode(int nid){
+	    	boolean re = false;
+	    	String c1 = getCollection(false);
+			if(!StringUtils.isEmpty(c1) ){
+				CloudSolrServer cloudSolrServer = getCloudSolrServer(Configure.ZookeeperHosts, c1);    
+				boolean stat =  deleteIndexForNode(cloudSolrServer,nid);
+				if(stat){
+					logger.info("index Incremental success ,nid:"+nid);
+					re = true;
+				}else{
+					logger.error("index Incremental failed ,nid:"+nid);
+				}
+					
+			 }
+	    	return re;
+	    }
+	    
+	    public boolean deleteIndexForNode(SolrServer solrServer,int nid){
+	    	boolean re =false;
+	    	try {
+				solrServer.deleteById(String.valueOf(nid));
+				UpdateResponse updateResponse = solrServer.commit();
+				int stat = updateResponse.getStatus();
+				if(stat==0){
+					re =true;
+				}
+			} catch (SolrServerException e) {
+				e.printStackTrace();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}finally{
+				solrServer.shutdown();
+			}
+	    	return re;
+	    }
+	    
+	    public String getCollection(boolean needSwitch){
+	    	String c1 = null;
+	    	String json = zkService.getPathValue(Configure.ZookeeperCollectionAliasesPath);
+	    	JSONObject jsonObject = JSONObject.fromObject(json);
+	    	JSONObject o= (JSONObject) jsonObject.get("collection");
+	    	if(o.containsKey(Configure.SolrCollectionEnv)){
+	    		String collectionName = (String) o.get(Configure.SolrCollectionEnv);
+	    		String[] array = collectionName.split(",");
+	    		c1 = array[0];
+	    		if(needSwitch){
+	    			if(c1.endsWith("1")){
+		    			c1 = c1.replace("1", "2");
+		    		}else if(c1.endsWith("2")){
+		    			c1 = c1.replace("2", "1");
+					}
+	    		}
+	    	}
+	    	return c1;
+	    }
+	    
+	    public boolean createIndexFullyForNode(){
+	    	boolean re = false;
+	    	Map<String, Node> node_map = dumpService.dump();
+	    	String c1 = getCollection(true);
+	    	//String c1 = "";
+	    
+			 if(node_map.size()>0 && !StringUtils.isEmpty(c1) ){
+				CloudSolrServer cloudSolrServer = getCloudSolrServer(Configure.ZookeeperHosts, c1);    
+				boolean success = deleteAllIndex(cloudSolrServer);
+				if(success){
+	            	logger.info("delete All Index success ,collection:"+c1);
+					int count =  createIndexForNode(cloudSolrServer,node_map,true);
+					if(count >0){
+						logger.info("index success ,size:"+count);
+						re = switchIndex(c1, zkService.getLiveNode());
+					}
+				}else {
+					
+				}
+			 }
+			 
+	    	return re;
+	    }
+	    
+	    public int createIndexForNode(SolrServer solrServer,Map<String, Node> nodeMap,boolean isFully){
+			logger.info("create index begin.....");
+			long starttime = System.currentTimeMillis();
+	    	String key = null;
+	    	Node node = null;
+            Collection<SolrInputDocument> docs = new ArrayList<SolrInputDocument>();  
+
+            int count = 0;
+            try {
+	        	for(Entry<String, Node> entry : nodeMap.entrySet()){
+	        		count++;
+	    			key = entry.getKey();
+	    			node = entry.getValue();
+    			
+		            SolrInputDocument doc = new SolrInputDocument();  
+		            doc.addField("id", node.getNid());
+		            doc.addField("nid", node.getNid());  
+		            doc.addField("vid", node.getVid());  
+		            doc.addField("title", node.getTitle());  
+		            doc.addField("summary", node.getSummary());  
+		            doc.addField("sitedate", node.getSitedate());  
+		            doc.addField("body", node.getInvbody());  
+		            doc.addField("type_tid", node.getContentTypeTid());  
+		            doc.addField("type_name", node.getContentTypeName());  
+		          //  doc.addField("channel_tid", node.getChannelTid());  
+		            doc.addField("channel_name", node.getChannelName());  
+		          //  doc.addField("sub_channel_tid", node.getSubChannelTid());  
+		            doc.addField("sub_channel_name", node.getSubChannelName());  
+		            doc.addField("partner_name", node.getPartenr_name());  
+		            doc.addField("partner_id", node.getPartenr_id());  
+		            doc.addField("image_url", node.getImage_url());  
+		            doc.addField("image_size", node.getImage_size());  
+		            doc.addField("video_url", node.getVideo_url());  
+		            doc.addField("video_size", node.getVideo_size());  
+		            doc.addField("img_alt", node.getImg_alt());
+		            doc.addField("img_title", node.getImg_title());  
+		            doc.addField("author_id", node.getAuthor_id());  
+		            doc.addField("author_name", node.getAuthor_name());
+		            doc.addField("ticker", node.getTickers());  
+		            doc.addField("url", node.getUrl());
+		            doc.addField("tag_name", node.getTag_names());
+		            doc.addField("tag_id", node.getTag_ids()); 
+		            doc.addField("is_mfo_url", node.isIs_mfo_url()); 
+		            doc.addField("is_include_ticker", node.isIs_include_ticker()); 
+		            doc.addField("tag_group_name", node.getTag_group_name()); 
+		            doc.addField("tag_group_id", node.getTag_group_id()); 
+		            doc.addField("is_sponsored_content", node.getSponsored_content()==1?true:false); 
+		            doc.addField("is_auto_republish", node.getAuto_republish_type()==1?true:false); 
+		            doc.addField("term_type", node.getTerm_type());
+		            doc.addField("advertising_name", node.getAdvertising_name());
+		            doc.addField("sub_advertising_name", node.getSub_advertising_name());
+		            
+		            docs.add(doc);  
+		            
+		            if(count%10000==0 || count>=nodeMap.size()){
+		            	logger.info("doc commit count:"+count);
+		            	solrServer.add(docs);
+						solrServer.commit();
+						docs.clear();
+		            }
+	    		}
+	        	commitCount = count;
+	        	if(isFully){
+	        		long ostime =System.currentTimeMillis();
+		    	    UpdateResponse updataR = solrServer.optimize();
+					logger.info("optimize stat :"+updataR.getStatus()+",exe time:"+(System.currentTimeMillis()-ostime));
+	        	}
+	        	
+
+            }catch(SolrServerException e) {  
+	            e.printStackTrace(); 
+	            return 0;
+	        }catch(IOException e){  
+	            e.printStackTrace();
+	            return 0;
+	        }catch (Exception e) {  
+	            e.printStackTrace();  
+	            return 0;
+	        }        
+			logger.info("create index success,exe time :"+(System.currentTimeMillis()-starttime));
+
+	    	return count;
+	    }
+	    
+	    public int createIndexForTaxonomy(SolrServer solrServer,List<Taxonomy> list,boolean isFully){
+			logger.info("create index begin.....");
+			long starttime = System.currentTimeMillis();
+	    	String key = null;
+            Collection<SolrInputDocument> docs = new ArrayList<SolrInputDocument>();  
+            int count = 0;
+            long nid ;
+            try {
+	        	for(Taxonomy t : list){
+	        		count++;
+	    			nid = t.getNid();
+	    			key = nid+"_"+t.getVid();
+    			
+		            SolrInputDocument doc = new SolrInputDocument();  
+		            doc.addField("id", count);
+		            doc.addField("nid", t.getNid());
+		            doc.addField("ad_target", t.getAdTarget());
+		            doc.addField("advertising", t.getAdvertising());  
+		            doc.addField("channel", t.getChannel());  
+		            doc.addField("created_by", t.getCreatedBy());  
+		            doc.addField("created_on", DataConvertor.longString2Calendar(t.getCreatedOn()+"000"));  
+		        //    doc.addField("design", t.getDesign());  
+		            doc.addField("feature", t.getFeature());  
+		            doc.addField("follow", t.isFollow());  
+		            doc.addField("hash_key", t.getHashKey());  
+		            doc.addField("index", t.isIndex());  
+		            doc.addField("interest_level", t.getInterestLevel());  
+		            doc.addField("master", t.getMaster());  
+		            doc.addField("no_index_params", Boolean.valueOf(t.getOutNoIndexParams()));  
+		            doc.addField("page_id", t.getPageID());  
+		            doc.addField("path", t.getPath());  
+		            doc.addField("sub_advertising", t.getSubAdvertising());  
+		            doc.addField("sub_channel", t.getSubChannel());  
+		            doc.addField("tag_name", t.getTag_names());
+		            doc.addField("tag_id", t.getTag_ids());
+		            doc.addField("timelessness", t.getTimelessness());  
+		            doc.addField("type", t.getType());  
+		            doc.addField("updated_by", t.getUpdatedBy());
+		            doc.addField("updated_on", DataConvertor.longString2Calendar(t.getCreatedOn()+"000"));  
+		            doc.addField("website", t.getWebsite());
+		            doc.addField("priority", t.getTag_prioritys());
+		            docs.add(doc);  
+		            
+		            if(count%10000==0 || count>=list.size()){
+		            	logger.info("doc commit count:"+count);
+		            	solrServer.add(docs);
+						solrServer.commit();
+						docs.clear();
+		            }
+	    		}
+	        	commitCount = count;
+	        	if(isFully){
+	        		long ostime =System.currentTimeMillis();
+		    	    UpdateResponse updataR = solrServer.optimize();
+					logger.info("optimize stat :"+updataR.getStatus()+",exe time:"+(System.currentTimeMillis()-ostime));
+	        	}
+            }catch(SolrServerException e) {  
+	            e.printStackTrace(); 
+	            return 0;
+	        }catch(IOException e){  
+	            e.printStackTrace();
+	            return 0;
+	        }catch (Exception e) {  
+	            e.printStackTrace();  
+	            return 0;
+	        }        
+			logger.info("create index success,exe time :"+(System.currentTimeMillis()-starttime));
+	    	return count;
+	    }
+	    
+	   
+	    
+	    /** 
+	     * @param args 
+	     * @throws SecurityException 
+	     * @throws NoSuchFieldException 
+	     */  
+	    public static void main(String[] args) throws NoSuchFieldException, SecurityException { 
+	    	
+	    	/**
+	    	String json = "{\"collection\":{\"invDataSolrAlias\":\"invDataSolr\",\"inv_staging\":\"inv_staging_collection2\",\"inv_prod\":\"inv_prod_collection1\"}}";
+	    
+	    	JSONObject jsonObject = JSONObject.fromObject(json);
+	    	JSONObject o= (JSONObject) jsonObject.get("collection");
+	    	for(Object name : o.keySet()){
+		    	System.out.println(o.get(name.toString()));
+	    	}
+	    	
+	    	long a = System.currentTimeMillis();
+	    	TaskEntity taskEntity = new TaskEntity("node", "update", 10000, 10000,a );
+	    	Gson gson = new Gson();
+	    	System.out.println(gson.toJson(taskEntity));
+	    	///System.out.println(System.currentTimeMillis());
+	    	**/
+	    	// 	JsonElement jsonElement = g
+//System.out.println(jsonElement.get);
+	    	
+	    	System.out.println(System.currentTimeMillis());
+	    	
+		        final String zkHost = "solrcloud002.la1.vcinv.net:2181,solrcloud001.la1.vcinv.net:2181,solrcloud003.la1.vcinv.net:2181";       
+		        final String  defaultCollection = "inv_staging_collection1";  
+		          
+		        CloudSolrServer cloudSolrServer = getCloudSolrServer(zkHost,defaultCollection);         
+		        System.out.println("The Cloud SolrServer Instance has benn created!");            
+		        cloudSolrServer.setDefaultCollection(defaultCollection);  
+		        cloudSolrServer.shutdown();
+		        cloudSolrServer.shutdown();
+		        
+		        CloudSolrServer cloudSolrServer2 = getCloudSolrServer(zkHost,"inv_staging_collection2");   
+		        
+			    System.out.println(cloudSolrServer.getDefaultCollection());;
+
+		        /**
+		        System.out.println("The cloud Server has been connected !!!!"); 
+		        Configure.init();
+				ZKService zkService = new ZKService("solrcloud002.la1.vcinv.net:2181,solrcloud001.la1.vcinv.net:2181,solrcloud003.la1.vcinv.net:2181", "", "/solrcloud/task_queue");
+				zkService.start();
+				System.out.println(zkService.getLiveNode());
+**/
+/**
+		        IndexService main = new IndexService();  
+		        //main.setZkService(zkService);
+		        boolean success = main.deleteAllIndex(cloudSolrServer);
+		        System.out.println(success);
+		        
+		        /**
+		        Map<String,List<Tag>> tagMap = new HashMap<String, List<Tag>>();
+		        List<Tag> list = new ArrayList<Tag>();
+		        list.add(new Tag(new String[]{"1","1","1","test"}));
+		        tagMap.put("1_1", list);
+		        
+		        Map<String,String> aliasMap = new HashMap<String, String>();
+		        aliasMap.put("1_1", "/url/1");
+		        
+		        Map<String,Node> nodeMap = new HashMap<String, Node>();
+		        nodeMap.put("1_1", new Node(new String[]{"1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1"}));
+		        
+		        Map<String,List<String>> tickerNodeMap = new HashMap<String, List<String>>();
+		        List<String> list2 = new ArrayList<String>();
+		        list2.add("msft");
+		        tickerNodeMap.put("1_1", list2);
+		        //测试实例！  
+		        IndexService main = new IndexService();  
+		        main.createIndex(cloudSolrServer,nodeMap);
+		        **/
+		//        System.out.println("测试添加index！！！");       
+		        //添加index  
+		//        test.addIndex(cloudSolrServer);  
+		          
+		//        System.out.println("测试查询query！！！！");  
+		//        test.search(cloudSolrServer, "id:*");  
+		//          
+		//        System.out.println("测试删除！！！！");  
+		//        test.deleteAllIndex(cloudSolrServer);  
+		//        System.out.println("删除所有文档后的查询结果：");  
+		    //    test.search(cloudSolrServer, "zhan");      
+		//        System.out.println("hashCode"+test.hashCode());
+		                  
+		         // release the resource   
+		   //     cloudSolrServer.shutdown();  
+	   
+	    }  
+}

@@ -1,0 +1,703 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap     
+    PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"     
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="Dump">
+
+        <typeAlias alias="Node" type="com.valueclickbrands.solr.model.Node"/>
+        <typeAlias alias="Tag" type="com.valueclickbrands.solr.model.Tag"/>
+        <typeAlias alias="UrlAlias" type="com.valueclickbrands.solr.model.UrlAlias"/>
+        <typeAlias alias="TagGroupMap" type="com.valueclickbrands.solr.model.TagGroup"/>
+        <typeAlias alias="Taxonomy" type="com.valueclickbrands.solr.model.Taxonomy"/>
+        <typeAlias alias="TaxonomyTag" type="com.valueclickbrands.solr.model.TaxonomyTag"/>
+        <typeAlias alias="AutoRepublish" type="com.valueclickbrands.solr.model.AutoRepublish"/>
+        <typeAlias alias="PartnerLinks" type="com.valueclickbrands.solr.model.PartnerLinks"/>
+        <typeAlias alias="WebToolSettings" type="com.valueclickbrands.solr.model.WebToolSettings"/>
+        <typeAlias alias="SynDate" type="com.valueclickbrands.solr.model.SynDate"/>
+        <typeAlias alias="Related" type="com.valueclickbrands.solr.model.Related"/>
+
+		<resultMap class="Related" id="RelatedMap">
+                <result property="nid" column="nid" nullValue="0"/>
+                <result property="vid" column="vid" nullValue="0"/>
+                <result property="related_nid" column="related_nid" nullValue="0"/>
+        </resultMap>
+        
+        <resultMap class="Tag" id="Tagv2ResultMap">
+                <result property="tid" column="tag_tid" nullValue="0"/>
+                <result property="name" column="tag_name" />
+        </resultMap>
+        
+        <resultMap class="WebToolSettings" id="WebToolSettingsMap">
+                <result property="id" column="id" nullValue="0"/>
+                <result property="url_alias" column="url_alias" />
+                <result property="settings" column="settings" />
+                <result property="status" column="status" />
+        </resultMap>
+        
+        <resultMap class="TagGroupMap" id="TagGroupResultMap">
+                <result property="tid" column="tid" nullValue="0"/>
+                <result property="groupId" column="groupId" nullValue="0"/>
+                <result property="groupName" column="groupName" />
+        </resultMap>
+
+        <resultMap class="Tag" id="TagResultMap">
+                <result property="tid" column="tag_tid" nullValue="0"/>
+                <result property="name" column="tag_name" />
+                <result property="entity_id" column="nid" nullValue="0"/>
+                <result property="revision_id" column="vid" nullValue="0"/>
+                <result property="field_private_taxonomy_value" column="field_private_taxonomy_value" nullValue="0"/>
+        </resultMap>
+
+        <resultMap class="UrlAlias" id="UrlAliasResultMap">
+                <result property="source" column="source" />
+                <result property="url" column="alias" />
+        </resultMap>
+        
+        <resultMap class="AutoRepublish" id="AutoRepublishMap">
+                <result property="nid" column="nid" />
+                <result property="type" column="type" />
+        </resultMap>
+		
+		<resultMap class="Node" id="NodeResultMap">
+                <result property="nid" column="nid" />
+                <result property="vid" column="vid" />
+                <result property="title" column="title" />
+                <result property="summary" column="summary"/>
+                <result property="invbody" column="body"/>
+                <result property="sitedate" column="sitedate" nullValue="0"/>
+                <result property="contentTypeTid" column="type_tid" nullValue="0"/>
+                <result property="contentTypeName" column="type_name"/>
+                <result property="channelTid" column="channel_tid" nullValue="0"/>
+                <result property="channelName" column="channel_name"/>
+                <result property="tickerValue" column="ticker"/>
+                <result property="partenr_name" column="partenr_name"/>
+                <result property="partenr_id" column="partenr_id" nullValue="0"/>
+                <result property="image_url" column="image_url"/>
+                <result property="image_size" column="image_size" nullValue="0"/>
+                <result property="video_url" column="video_url"/>
+                <result property="video_size" column="video_size" nullValue="0"/>
+                <result property="img_alt" column="img_alt"/>
+                <result property="img_title" column="img_title"/>
+                <result property="author_id" column="author_id" nullValue="0"/>
+                <result property="author_name" column="author_name"/>
+                <result property="subChannelTid" column="sub_channel_tid" nullValue="0"/>
+                <result property="subChannelName" column="sub_channel_name"/>
+                <result property="sponsored_content" column="sponsored_content" nullValue="0"/>
+                <result property="advertising_name" column="advertising_name"/>
+                <result property="sub_advertising_name" column="sub_advertising_name"/>
+                <result property="featured_video_nid" column="featured_video_nid" nullValue="0"/>
+                <result property="show_main_image" column="show_main_image" nullValue="0"/>
+                <result property="seo_standout" column="seo_standout" nullValue="0"/>
+                <result property="original_sitedate" column="original_sitedate" nullValue="0"/>
+                <result property="final_time" column="final_time" nullValue="0"/>
+                <result property="metatag_data" column="metatag_data"/>
+                <result property="partner_url" column="partner_url"/>
+                <result property="partner_image_url" column="partner_image_url"/>
+                <result property="title_old" column="title_old"/>
+                <result property="node_type" column="node_type"/>
+                <result property="child_body" column="child_body"/>
+                <result property="child_summary" column="child_summary"/>
+                <result property="root_type_name" column="root_type_name"/>
+                <result property="root_type_id" column="root_type_id" nullValue="0"/>
+                <result property="root_nid" column="root_nid" nullValue="0"/>
+                <result property="root_title" column="root_title" />
+                <result property="author_legal_disclaimer" column="author_legal_disclaimer" />
+                <result property="video_series_name" column="video_series_name" />
+                <result property="video_series_id" column="video_series_id"  nullValue="0"/>
+                <result property="image_filemime" column="image_filemime" />
+                <result property="video_filemime" column="video_filemime" />
+                
+                <result property="plid" column="plid" nullValue="0"/>
+                <result property="link_path" column="link_path" />
+                <result property="link_title" column="link_title" />
+                <result property="has_children" column="has_children"  nullValue="0" />
+                <result property="weight" column="weight"  nullValue="0" />
+                <result property="mlid" column="mlid"  nullValue="0" />
+                <result property="depth" column="depth"  nullValue="0" />
+                <result property="p1" column="p1"  nullValue="0"/>
+                <result property="p2" column="p2"  nullValue="0" />
+                <result property="p3" column="p3"  nullValue="0" />
+                <result property="p4" column="p4"  nullValue="0" />
+                <result property="p5" column="p5"  nullValue="0" />
+                <result property="p6" column="p6"  nullValue="0" />
+                <result property="p7" column="p7"  nullValue="0" />
+                <result property="p8" column="p8"  nullValue="0" />
+                <result property="p9" column="p9"  nullValue="0" />
+                <result property="pnid" column="pnid" nullValue="0" />
+                
+        </resultMap>
+        
+		<resultMap class="Taxonomy" id="TaxonomyMap">
+                <result property="nid" column="nid" />
+                <result property="vid" column="vid" />
+                <result property="pageID" column="nid" />
+                <result property="channel" column="channel_name"/>
+                <result property="subChannel" column="sub_channel_name"/>
+                <result property="advertising" column="advertising_name"/>
+                <result property="subAdvertising" column="sub_advertising_name"/>
+                <result property="adTarget" column="adtarget"/>
+                <result property="type" column="type_name"/>
+                <result property="p_type" column="p_type_name"/>
+                <result property="lucrativeness" column="lucrativeness"/>
+                <result property="timelessness" column="timelessness"/>
+                <result property="feature" column="feature"/>
+                <result property="design" column="design"/>
+                <result property="interestLevel" column="outInterest_level"/>
+                <result property="noIndexParams" column="outno_index_params"  nullValue="0"/>
+                <result property="master" column="outMaster"  nullValue="0"/>
+                <result property="createdBy" column="author_name"/>
+                <result property="createdOn" column="createon"/>
+                <result property="updatedBy" column="updated_by"/>
+                <result property="updatedOn" column="updated_on"/>
+                <result property="metatag_data" column="metatag_data"/>
+                <result property="keywords" column="keywords"/>
+                <result property="node_type" column="node_type"/>
+                
+        </resultMap>
+        
+        <resultMap class="Taxonomy" id="TaxonomyForPageMap">
+                <result property="pid" column="pid" />
+                <result property="pageID" column="pid" />
+                <result property="channel" column="channel_name"/>
+                <result property="subChannel" column="sub_channel_name"/>
+                <result property="advertising" column="advertising_name"/>
+                <result property="subAdvertising" column="sub_advertising_name"/>
+                <result property="adTarget" column="adtarget"/>
+                <result property="type" column="type_name"/>
+                <result property="lucrativeness" column="lucrativeness"/>
+                <result property="timelessness" column="timelessness"/>
+                <result property="feature" column="feature"/>
+                <result property="interestLevel" column="outInterest_level"/>
+                <result property="noIndexParams" column="outno_index_params"  nullValue="0"/>
+                <result property="master" column="outMaster"  nullValue="0"/>
+                <result property="createdBy" column="author_name"/>
+                <result property="author_full_name" column="author_full_name"/>
+                <result property="createdOn" column="createon"/>
+                <result property="updatedBy" column="author_name"/>
+                <result property="updatedOn" column="updated_on"/>
+                <result property="metatag_data" column="metatag_data"/>
+                <result property="keywords" column="keywords"/>
+        </resultMap>
+        
+        <resultMap class="TaxonomyTag" id="TaxonomyTagMap">
+                <result property="tag_id" column="tag_tid"  nullValue="0" />
+                <result property="tag_name" column="tag_name" />
+                <result property="nid" column="nid" />
+                <result property="vid" column="vid" />
+                <result property="field_private_taxonomy_value" column="field_private_taxonomy_value" nullValue="0"/>
+        </resultMap>
+          <resultMap class="PartnerLinks" id="PartnerLinksMap">
+                <result property="partnerlinks_title" column="partnerlinks_title" />
+                <result property="partnerlinks_url" column="partnerlinks_url" />
+                <result property="nid" column="nid" />
+                <result property="vid" column="vid" />
+        </resultMap>
+          <resultMap class="SynDate" id="SynDateMap">
+                <result property="nid" column="nid" nullValue="0" />
+                <result property="vid" column="vid" nullValue="0"/>
+                <result property="synDate" column="synDate" nullValue="0"/>
+        </resultMap>
+        
+        <select id="selectNodeDetail" resultMap="NodeResultMap" parameterClass="java.util.Map">
+				SELECT
+					n.nid                         AS nid,
+					n.vid                         AS vid,
+					headline.field_headline_value AS title,
+					summary.field_summary_value   AS summary,
+					sitedate.field_sitedate_value AS sitedate,
+					invbody.field_body_value      AS body,
+					ct_data.tid                   AS type_tid,
+					ct_data.name                  AS type_name,
+					channel_data.tid              AS sub_channel_tid,
+					channel_data.name             AS sub_channel_name,
+					p_channel_data_name.tid       AS channel_tid,
+					p_channel_data_name.name      AS channel_name,
+					advertising_data.name         AS sub_advertising_name,
+					p_advertising_data_name.name  AS advertising_name,
+					tickers.field_tickers_value   AS ticker,
+					u.name AS partenr_name,
+					comp.field_company_target_id AS partenr_id,
+					fileData.uri     AS image_url,
+					fileData.filesize    AS image_size,
+					fileData.`filemime`		AS image_filemime,
+					filevideo.uri    AS video_url,
+					filevideo.filesize    AS video_size,
+					filevideo.filemime AS video_filemime,
+					image.field_image_alt      AS img_alt  ,
+					image.field_image_title      AS img_title,
+					aut.`field_author_target_id`	AS author_id,
+					IFNULL(full_name.field_user_full_name_value,uu.name) AS author_name,
+					sponsore.field_is_sponsored_content_value AS sponsored_content,
+					featured_video.`field_featured_video_target_id` AS featured_video_nid,
+					show_main_image.`field_show_main_image_value` AS show_main_image,
+					seo_standout.`field_seo_standout_value`	AS seo_standout,
+					original_site_date.`stamp` AS original_sitedate,
+					MAX(workflow.`stamp`)			AS final_time,
+					metatag.`data`	AS metatag_data,
+					user_url.`field_user_url_value` AS partner_url,
+					user_image.`uri` AS partner_image_url,
+					n.`title`			  AS title_old,
+					n.`type`				AS node_type,
+					child_body.`body_value`		AS child_body,
+					child_body.`body_summary` 		AS child_summary,
+					p_ct_data.name                AS root_type_name,
+					p_ct_data.`tid`			AS root_type_id,
+					book.`bid`             AS root_nid,
+					p_headline.`field_headline_value` AS root_title,
+					disclaimer.`field_user_legal_disclaimer_value` AS author_legal_disclaimer,
+					video_entities_title.`title` AS video_series_name,
+					fv.`entity_id` AS video_series_id,
+					plid	AS plid,
+					ml.`mlid`,
+					link_path,
+					link_title,
+					has_children,
+					ml.weight,
+					depth,
+					p1,
+					p2,
+					p3,
+					p4,
+					p5,
+					p6,
+					p7,
+					p8,
+					p9,
+					pbook.`nid` AS pnid
+				    
+				FROM devel_node AS n
+				LEFT JOIN devel_field_revision_field_summary AS summary ON summary.entity_id = n.nid AND summary.revision_id = n.vid
+				LEFT JOIN devel_field_revision_field_body AS invbody ON invbody.entity_id = n.nid AND invbody.revision_id = n.vid
+				LEFT JOIN devel_field_revision_field_sitedate AS sitedate ON sitedate.entity_id = n.nid AND sitedate.revision_id = n.vid
+				LEFT JOIN devel_field_revision_field_content_type AS content_type ON content_type.entity_id = n.nid AND content_type.revision_id = n.vid
+				LEFT JOIN devel_taxonomy_term_data AS ct_data ON ct_data.tid = content_type.field_content_type_tid
+				
+				LEFT JOIN devel_field_revision_field_channel AS channel  ON channel.entity_id = n.nid AND channel.revision_id=n.vid
+				LEFT JOIN devel_taxonomy_term_data AS channel_data  ON channel_data.tid = channel.field_channel_tid
+				LEFT JOIN devel_taxonomy_term_hierarchy AS p_channel_data ON p_channel_data.tid = channel_data.tid
+				LEFT JOIN devel_taxonomy_term_data AS p_channel_data_name  ON p_channel_data.`parent` = p_channel_data_name.`tid`
+				
+				LEFT JOIN devel_field_revision_field_advertising AS advertising ON advertising.`entity_id` = n.`nid` AND advertising.`revision_id`=n.`vid`
+				LEFT JOIN devel_taxonomy_term_data AS advertising_data  ON advertising_data.tid = advertising.`field_advertising_tid`
+				LEFT JOIN devel_taxonomy_term_hierarchy AS p_advertising_data ON p_advertising_data.`tid` = advertising_data .`tid` 
+				LEFT JOIN devel_taxonomy_term_data AS p_advertising_data_name  ON p_advertising_data.`parent` = p_advertising_data_name.`tid`
+				
+				LEFT JOIN devel_field_revision_field_tickers AS tickers ON tickers.entity_id = n.nid AND tickers.revision_id = n.vid
+				
+				LEFT JOIN devel_field_revision_field_company AS comp ON n.nid=comp.entity_id AND n.vid=comp.revision_id
+				LEFT JOIN devel_users AS u ON comp.field_company_target_id=u.uid
+				LEFT JOIN devel_field_revision_field_user_url AS user_url ON user_url.`entity_id`=comp.`field_company_target_id`
+				LEFT JOIN devel_file_managed AS user_image ON user_image.`fid`=u.`picture`
+				
+				LEFT JOIN devel_field_revision_field_image AS image ON n.nid=image.entity_id AND n.vid=image.revision_id
+				LEFT JOIN devel_file_managed AS fileData ON fileData.fid=field_image_fid
+				LEFT JOIN devel_field_revision_field_video AS video ON video.entity_id=n.nid AND video.revision_id=n.vid
+				LEFT JOIN devel_file_managed AS filevideo  ON video.field_video_fid=filevideo.fid
+				LEFT JOIN devel_field_revision_field_author AS aut  ON aut.entity_id=n.nid AND aut.revision_id=n.vid 
+				LEFT JOIN devel_users AS uu ON aut.field_author_target_id=uu.uid
+				LEFT JOIN devel_field_data_field_user_full_name AS full_name ON full_name.entity_id=aut.field_author_target_id AND full_name.revision_id=aut.field_author_target_id
+				LEFT JOIN devel_field_revision_field_headline headline ON headline.entity_id = n.nid AND headline.revision_id = n.vid 
+				LEFT JOIN devel_field_revision_field_is_sponsored_content AS sponsore ON sponsore.`entity_id`=n.`nid` AND sponsore.`revision_id` = n.`vid` AND sponsore.`field_is_sponsored_content_value`=1
+				LEFT JOIN devel_field_revision_field_featured_video AS featured_video ON featured_video.`entity_id`= n.`nid` AND featured_video.`revision_id`= n.`vid`
+				LEFT JOIN devel_field_revision_field_show_main_image AS show_main_image ON show_main_image.`entity_id`=n.`nid` AND show_main_image.`revision_id` = n.`vid`
+				LEFT JOIN devel_field_revision_field_seo_standout  AS seo_standout ON seo_standout.`entity_id`=n.`nid` AND seo_standout.`revision_id` = n.`vid` 	
+				LEFT JOIN devel_node_original_site_date AS original_site_date ON original_site_date.`nid`=n.`nid`
+				LEFT JOIN devel_workflow_node_history AS workflow ON workflow.`nid`=n.`nid` AND sid = 10 
+				LEFT JOIN devel_metatag AS metatag ON n.`nid`= metatag.`entity_id` AND metatag.`entity_type`='node'
+				
+				LEFT JOIN devel_field_revision_body AS child_body ON child_body.`entity_id` = n.`nid` AND child_body.`revision_id` = n.`vid`
+				
+				LEFT JOIN devel_book AS book ON n.`nid`= book.`nid`
+				LEFT JOIN devel_field_revision_field_content_type AS p_content_type ON p_content_type.entity_id = book.`bid` 
+				LEFT JOIN devel_taxonomy_term_data AS p_ct_data ON p_ct_data.tid = p_content_type.field_content_type_tid
+				
+				LEFT JOIN devel_menu_links AS ml ON ml.mlid = book.mlid
+				LEFT JOIN devel_book AS pbook ON pbook.`mlid` = ml.`plid`
+				
+				LEFT JOIN devel_node AS p_node ON p_node.`nid` = book.`bid` 
+				LEFT JOIN devel_field_revision_field_headline AS p_headline ON p_headline.entity_id = p_node.`nid` AND p_headline.revision_id = p_node.`vid`
+				
+				LEFT JOIN devel_field_revision_field_user_legal_disclaimer AS disclaimer ON disclaimer.`entity_id` = aut.`field_author_target_id`
+				LEFT JOIN devel_field_data_field_custom_video_entities AS fv ON fv.`field_custom_video_entities_target_id` = n.`nid`
+				LEFT JOIN devel_node AS video_entities_title ON video_entities_title.`nid` = fv.`entity_id`
+
+				WHERE  n.`status`=1 AND (n.type = 'invcontent' OR n.type = 'invcontent_child' ) 
+			<dynamic >
+				<isPropertyAvailable property="nid">
+			        <isNotNull property="nid" prepend="and">  
+			           n.nid= #nid#
+			        </isNotNull>
+		        </isPropertyAvailable>
+				<isPropertyAvailable property="vid">
+			        <isNotNull property="vid" prepend="and">  
+			            n.vid = #vid#
+			        </isNotNull>
+		        </isPropertyAvailable>
+		        <isPropertyAvailable property="root_id">
+			        <isNotNull property="root_id" prepend="and">  
+			            book.`bid` = #root_id#
+			        </isNotNull>
+		        </isPropertyAvailable> 
+			</dynamic>
+			 GROUP BY n.`nid`
+        </select>
+       
+        <select id="selectALlUrl" resultMap="UrlAliasResultMap">
+			SELECT source,alias FROM devel_url_alias WHERE source LIKE 'node/%' OR source LIKE 'user/%'
+        </select> 
+
+		<select id="selectAutoRepublish" resultMap="AutoRepublishMap">
+			SELECT 			
+					 n.`nid` ,
+					 auto_republish.`type`
+			FROM devel_node AS n
+			JOIN devel_auto_republish_url_trace AS auto_republish ON auto_republish.`nid` = n.`nid`
+			where 1=1
+			<dynamic >
+				<isPropertyAvailable property="nid">
+			        <isNotNull property="nid" prepend="and">  
+			            n.`nid`= #nid#
+			        </isNotNull>
+		        </isPropertyAvailable>
+	  		</dynamic>
+        </select> 
+        
+		<select id="selectPartnerLinks" resultMap="PartnerLinksMap">
+			 SELECT  
+				field_partnerlinks_title AS partnerlinks_title,
+				field_partnerlinks_url AS partnerlinks_url,
+				partnerlinks.`entity_id` AS nid,
+				partnerlinks.`revision_id` AS vid
+			FROM devel_node AS n
+			JOIN devel_field_revision_field_partnerlinks AS partnerlinks ON n.`nid` = partnerlinks.`entity_id` AND n.`vid`= partnerlinks.`revision_id`
+			WHERE n.`status`=1
+			<dynamic >
+				<isPropertyAvailable property="nid">
+			        <isNotNull property="nid" prepend="and">  
+			            n.`nid`= #nid#
+			        </isNotNull> 
+		        </isPropertyAvailable>
+		        <isPropertyAvailable property="vid">
+			        <isNotNull property="vid" prepend="and">  
+			            n.`vid`= #nid#
+			        </isNotNull>
+		        </isPropertyAvailable>
+	  		</dynamic>
+        </select> 
+        
+       
+        
+        <select id="selectAllTag" resultMap="TagResultMap">
+            SELECT DISTINCT tags_data.tid  AS tag_tid, tags_data.name AS tag_name,tags.entity_id nid,tags.revision_id vid ,p.field_private_taxonomy_value 
+				FROM devel_field_revision_field_tags AS tags
+       		 	LEFT JOIN devel_taxonomy_term_data AS tags_data ON tags_data.tid = tags.field_tags_tid 
+       		 	LEFT JOIN devel_field_data_field_private_taxonomy AS p ON p.entity_type = 'taxonomy_term' AND p.bundle = 'tags' AND p.entity_id = tags_data.tid 
+        </select>
+		
+		<select id="selectAllTagv2" resultMap="Tagv2ResultMap">
+           SELECT tid as tag_tid,name as tag_name FROM devel_taxonomy_term_data WHERE vid=2 
+        </select>
+        
+		 <select id="selectAllTagGroup" resultMap="TagGroupResultMap">
+          SELECT tg.tid,tg.parent groupId,tg_name.`name` groupName FROM devel_taxonomy_group_hierarchy AS tg
+			LEFT JOIN devel_taxonomy_group AS tg_name ON tg.`parent` = tg_name.`gid` AND tg_name.`tid`=0  
+        </select>
+		
+         <select id="selectUrlById" resultMap="UrlAliasResultMap" parameterClass="map">
+			SELECT source,alias FROM devel_url_alias WHERE 1=1 
+			<dynamic >
+				<isPropertyAvailable property="source">
+			        <isNotNull property="source" prepend="AND">  
+			           source = #source#
+			        </isNotNull>
+		        </isPropertyAvailable>
+	  		</dynamic>
+        </select>
+        
+         <select id="selectTagById" resultMap="TagResultMap"  parameterClass="map">
+           SELECT DISTINCT tags_data.tid  AS tag_tid, tags_data.name AS tag_name,tags.entity_id nid,tags.revision_id vid,p.field_private_taxonomy_value
+				FROM devel_field_revision_field_tags AS tags
+       		 	LEFT JOIN devel_taxonomy_term_data AS tags_data ON tags_data.tid = tags.field_tags_tid
+       		 	LEFT JOIN devel_field_data_field_private_taxonomy AS p ON p.entity_type = 'taxonomy_term' AND p.bundle = 'tags' AND p.entity_id = tags_data.tid
+			WHERE tags_data.tid IS NOT NULL 
+			<dynamic >
+				<isPropertyAvailable property="nid">
+			        <isNotNull property="nid" prepend="AND">  
+			          tags.entity_id = #nid#
+			        </isNotNull>
+		        </isPropertyAvailable>
+	  		</dynamic>
+	  		<dynamic >
+				<isPropertyAvailable property="vid">
+			        <isNotNull property="vid" prepend="AND">  
+			          tags.revision_id = #vid#
+			        </isNotNull>
+		        </isPropertyAvailable>
+	  		</dynamic>
+        </select>
+		
+		 <select id="selectTagGroupById" resultMap="TagGroupResultMap"  parameterClass="list">
+          SELECT tg.tid,tg.parent groupId,tg_name.`name` groupName FROM devel_taxonomy_group_hierarchy AS tg
+			LEFT JOIN devel_taxonomy_group AS tg_name ON tg.`parent` = tg_name.`gid` AND tg_name.`tid`=0  
+			WHERE tg.tid IN 
+				<iterate open="(" close=")" conjunction=",">  
+           			 #[]#  
+        		</iterate>  
+        </select>
+        
+         <select id="selectTaxonomyForNode" resultMap="TaxonomyMap"  parameterClass="map">
+			
+			SELECT
+			    n.nid                         AS nid,
+			    n.vid                         AS vid,
+			    ct_data.name                  AS type_name,
+			    p_ct_data.name                AS p_type_name,
+			    n.`created` AS createon,
+			    channel_data.tid              AS sub_channel_tid,
+			    channel_data.name             AS sub_channel_name,
+			    p_channel_data_name.tid       AS channel_tid,
+			    p_channel_data_name.name      AS channel_name,
+			    advertising_data.name         AS sub_advertising_name,
+			    p_advertising_data_name.name  AS advertising_name,
+			    aut.`field_author_target_id`	AS author_id,
+			    IFNULL(full_name.field_user_full_name_value,uu.name) AS author_name,
+			    adtarget.`field_adtarget_value` AS adtarget,
+			    design.`field_design_value` AS design,
+			    feature.field_feature_value AS feature,
+			    lucrativeness.field_lucrativeness_value AS lucrativeness,
+			    metatag.`data` 		AS metatag_data,
+			    interest_level_t.`name`	AS outInterest_level,
+			    master_node.field_master_value AS outMaster,
+			    niindexparams.field_noindexparams_value AS outno_index_params,
+			    timelessness_t.name		AS timelessness,
+			    book.`bid` 			AS bid,
+			    MAX(workflow.`stamp`)		AS Updated_on,
+			    u.`name`			AS Updated_by,
+			    field_keywords.`field_keywords_value` AS keywords,
+			    n.type				AS node_type
+			    
+			FROM devel_node AS n
+			LEFT JOIN devel_field_revision_field_sitedate AS sitedate ON sitedate.entity_id = n.nid AND sitedate.revision_id = n.vid
+			LEFT JOIN devel_field_revision_field_content_type AS content_type ON content_type.entity_id = n.nid AND content_type.revision_id = n.vid
+			LEFT JOIN devel_taxonomy_term_data AS ct_data ON ct_data.tid = content_type.field_content_type_tid
+			LEFT JOIN devel_field_revision_field_channel AS channel  ON channel.entity_id = n.nid AND channel.revision_id=n.vid
+			LEFT JOIN devel_taxonomy_term_data AS channel_data  ON channel_data.tid = channel.field_channel_tid
+			LEFT JOIN devel_taxonomy_term_hierarchy AS p_channel_data ON p_channel_data.tid = channel_data.tid
+			LEFT JOIN devel_taxonomy_term_data AS p_channel_data_name  ON p_channel_data.`parent` = p_channel_data_name.`tid`
+			LEFT JOIN devel_field_revision_field_advertising AS advertising ON advertising.`entity_id` = n.`nid` AND advertising.`revision_id`=n.`vid`
+			LEFT JOIN devel_taxonomy_term_data AS advertising_data  ON advertising_data.tid = advertising.`field_advertising_tid`
+			LEFT JOIN devel_taxonomy_term_hierarchy AS p_advertising_data ON p_advertising_data.`tid` = advertising_data .`tid` 
+			LEFT JOIN devel_taxonomy_term_data AS p_advertising_data_name  ON p_advertising_data.`parent` = p_advertising_data_name.`tid`
+			LEFT JOIN devel_field_revision_field_author AS aut  ON aut.entity_id=n.nid AND aut.revision_id=n.vid 
+			LEFT JOIN devel_users AS uu ON aut.field_author_target_id=uu.uid
+			LEFT JOIN devel_field_data_field_user_full_name AS full_name ON full_name.entity_id=aut.field_author_target_id AND full_name.revision_id=aut.field_author_target_id
+			LEFT JOIN devel_field_revision_field_adtarget AS adtarget ON n.`nid` = adtarget.`entity_id` AND n.`vid`=adtarget.`revision_id` 
+			LEFT JOIN devel_field_revision_field_design AS design ON n.`nid` = design.`entity_id` AND n.`vid`=design.`revision_id`
+			LEFT JOIN devel_field_revision_field_feature AS feature ON n.`nid` = feature.`entity_id` AND n.`vid` = feature.`revision_id`
+			LEFT JOIN devel_field_revision_field_lucrativeness AS lucrativeness ON n.`nid` = lucrativeness.`entity_id` AND n.`vid`=lucrativeness.`revision_id`
+			LEFT JOIN devel_metatag AS metatag ON n.`nid`= metatag.`entity_id` AND metatag.`entity_type`='node'
+			LEFT JOIN devel_field_revision_field_interest_level AS interest_level ON n.`nid`=interest_level.`entity_id` AND n.`vid`=interest_level.`revision_id`
+			LEFT JOIN devel_taxonomy_term_data AS interest_level_t ON interest_level_t.`tid` = interest_level.`field_interest_level_tid`
+			LEFT JOIN devel_field_revision_field_master AS master_node ON n.`nid`= master_node.`entity_id` AND n.`vid`=master_node.`revision_id`
+			LEFT JOIN devel_field_revision_field_noindexparams AS niindexparams ON n.`nid`= niindexparams.`entity_id` AND n.`vid`=niindexparams.`revision_id`
+			LEFT JOIN devel_field_revision_field_timelessness AS timelessness ON timelessness.`entity_id`=n.`nid` AND timelessness.`revision_id`=n.`vid`
+			LEFT JOIN devel_taxonomy_term_data AS timelessness_t ON timelessness_t.`tid` = timelessness.`field_timelessness_tid`
+			LEFT JOIN devel_book AS book ON n.`nid`=book.`nid`
+			LEFT JOIN devel_field_revision_field_content_type AS p_content_type ON p_content_type.entity_id = book.`bid`
+			LEFT JOIN devel_taxonomy_term_data AS p_ct_data ON p_ct_data.tid = p_content_type.field_content_type_tid
+			
+			LEFT JOIN devel_workflow_node_history AS workflow ON n.`nid`= workflow.`nid` AND sid = 10 
+			LEFT JOIN devel_users AS u ON workflow.uid = u.uid 
+			LEFT JOIN devel_field_revision_field_keywords  AS field_keywords ON field_keywords.`entity_id` = n.`nid`
+			WHERE  n.`status`=1 AND ( n.type = 'invcontent'  OR n.type ='inv_static_page' OR n.`type`='exam_prep_landing' OR n.type = 'invcontent_child' )
+			<dynamic >
+				<isPropertyAvailable property="nid">
+			        <isNotNull property="nid" prepend="and">  
+			           n.nid= #nid#
+			        </isNotNull>
+		        </isPropertyAvailable>
+				<isPropertyAvailable property="vid">
+			        <isNotNull property="vid" prepend="and">  
+			            n.vid = #vid#
+			        </isNotNull>
+		        </isPropertyAvailable>
+		        <isPropertyAvailable property="root_id">
+			        <isNotNull property="root_id" prepend="and">  
+			            book.`bid` = #root_id#
+			        </isNotNull>
+		        </isPropertyAvailable> 
+			</dynamic>
+			 GROUP BY n.`nid`
+        </select>
+        
+        <select id="selectTaxonomyTagForNode" resultMap="TaxonomyTagMap" parameterClass="map">
+	        SELECT DISTINCT tags_data.tid  AS tag_tid, tags_data.name AS tag_name,tags.entity_id nid,tags.revision_id vid ,p.field_private_taxonomy_value 
+				FROM devel_field_revision_field_tags AS tags
+				LEFT JOIN devel_taxonomy_term_data AS tags_data ON tags_data.tid = tags.field_tags_tid 
+				LEFT JOIN devel_field_data_field_private_taxonomy AS p ON p.entity_type = 'taxonomy_term' AND p.bundle = 'tags' AND p.entity_id = tags_data.tid  
+				WHERE 1=1 
+				<dynamic >
+				<isPropertyAvailable property="nid">
+			        <isNotNull property="nid" prepend="AND">  
+			          tags.entity_id = #nid#
+			        </isNotNull>
+		        </isPropertyAvailable>
+	  		</dynamic>
+	  		<dynamic >
+				<isPropertyAvailable property="vid">
+			        <isNotNull property="vid" prepend="AND">  
+			          tags.revision_id = #vid#
+			        </isNotNull>
+		        </isPropertyAvailable>
+	  		</dynamic>
+		</select>
+		
+		<select id="selectTaxonomyForPage" resultMap="TaxonomyForPageMap"  parameterClass="map">
+	       SELECT
+			    p.`pid`                         AS pid,
+			    ct_data.name                  AS type_name,
+			    p.`created` AS createon,
+			    channel_data.tid              AS sub_channel_tid,
+			    channel_data.name             AS sub_channel_name,
+			    p_channel_data_name.tid       AS channel_tid,
+			    p_channel_data_name.name      AS channel_name,
+			    advertising_data.name         AS sub_advertising_name,
+			    p_advertising_data_name.name  AS advertising_name,
+			    u.`name`			  AS author_name,
+			    full_name.field_user_full_name_value AS author_full_name,
+			    adtarget.`field_page_adtarget_value` AS adtarget,
+			    feature.`field_page_feature_value` AS feature,
+			    lucrativeness.`field_page_lucrativeness_value` AS lucrativeness,
+			    metatag.`data` 		AS metatag_data,
+			    interest_level_t.`name`	AS outInterest_level,
+			    master_node.`field_page_master_value` AS outMaster,
+			    niindexparams.`field_page_noindexparams_value` AS outno_index_params,
+			    timelessness_t.name		AS timelessness,
+			    p.`changed`			AS updated_on,
+			    field_keywords.`field_page_keywords_value` AS keywords
+			FROM devel_invpage AS p
+			LEFT JOIN devel_field_revision_field_page_content_type AS content_type ON content_type.entity_id = p.`pid` 
+			LEFT JOIN devel_taxonomy_term_data AS ct_data ON ct_data.tid = content_type.`field_page_content_type_tid`
+			
+			LEFT JOIN devel_field_revision_field_page_channel AS channel  ON channel.entity_id = p.`pid`
+			LEFT JOIN devel_taxonomy_term_data AS channel_data  ON channel_data.tid = channel.`field_page_channel_tid`
+			LEFT JOIN devel_taxonomy_term_hierarchy AS p_channel_data ON p_channel_data.tid = channel_data.tid
+			LEFT JOIN devel_taxonomy_term_data AS p_channel_data_name  ON p_channel_data.`parent` = p_channel_data_name.`tid`
+			
+			LEFT JOIN devel_field_revision_field_page_advertising AS advertising ON advertising.`entity_id` = p.`pid`
+			LEFT JOIN devel_taxonomy_term_data AS advertising_data  ON advertising_data.tid = advertising.`field_page_advertising_tid`
+			LEFT JOIN devel_taxonomy_term_hierarchy AS p_advertising_data ON p_advertising_data.`tid` = advertising_data .`tid` 
+			LEFT JOIN devel_taxonomy_term_data AS p_advertising_data_name  ON p_advertising_data.`parent` = p_advertising_data_name.`tid`
+			
+			LEFT JOIN devel_field_revision_field_page_adtarget AS adtarget ON p.`pid` = adtarget.`entity_id`
+			
+			LEFT JOIN devel_field_revision_field_page_feature AS feature ON p.`pid` = feature.`entity_id` 
+			
+			LEFT JOIN devel_field_revision_field_page_lucrativeness AS lucrativeness ON p.`pid` = lucrativeness.`entity_id`
+			
+			LEFT JOIN devel_metatag AS metatag ON p.pid= metatag.`entity_id` AND metatag.`entity_type`='invpage'
+			
+			LEFT JOIN devel_field_revision_field_page_interest_level AS interest_level ON p.`pid`=interest_level.`entity_id`
+			LEFT JOIN devel_taxonomy_term_data AS interest_level_t ON interest_level_t.`tid` = interest_level.`field_page_interest_level_tid`
+			
+			LEFT JOIN devel_field_revision_field_page_master AS master_node ON p.`pid`= master_node.`entity_id`
+			LEFT JOIN devel_field_revision_field_page_noindexparams AS niindexparams ON p.`pid`= niindexparams.`entity_id`
+			
+			LEFT JOIN devel_field_revision_field_page_timelessness AS timelessness ON timelessness.`entity_id`=p.`pid` 
+			LEFT JOIN devel_taxonomy_term_data AS timelessness_t ON timelessness_t.`tid` = timelessness.`field_page_timelessness_tid`
+			
+			LEFT JOIN devel_users AS u ON u.uid = p.`uid`
+			LEFT JOIN devel_field_data_field_user_full_name AS full_name ON full_name.entity_id=u.`uid`
+			LEFT JOIN devel_field_revision_field_page_keywords AS field_keywords ON field_keywords.`entity_id` = p.`pid`
+			WHERE   (p.`type`='invpage'  OR p.`type`='invautopage' 
+			<dynamic >
+				<isPropertyAvailable property="type">
+			        <isNotNull property="type" prepend="OR">  
+			            p.`type`= #type#
+			        </isNotNull>
+		        </isPropertyAvailable>
+	  		</dynamic>
+			)
+			<dynamic >
+			<isPropertyAvailable property="pid">
+		        <isNotNull property="pid" prepend="and">  
+		            p.`pid`= #pid#
+		        </isNotNull>
+	        </isPropertyAvailable>
+	  	</dynamic>
+		
+		</select>
+		
+		<select id="selectTaxonomyTagForPage" resultMap="TaxonomyTagMap" parameterClass="map">
+				SELECT DISTINCT tags_data.tid  AS tag_tid, tags_data.name AS tag_name,tags.entity_id nid,tags.revision_id vid ,p.field_private_taxonomy_value 
+			FROM devel_field_revision_field_page_tags AS tags
+			LEFT JOIN devel_taxonomy_term_data AS tags_data ON tags_data.tid = tags.`field_page_tags_tid` 
+			LEFT JOIN devel_field_data_field_private_taxonomy AS p ON p.entity_type = 'taxonomy_term' AND p.bundle = 'tags' AND p.entity_id = tags_data.tid AND tags.`entity_type`='invpage' 
+			<dynamic prepend="WHERE">
+			<isPropertyAvailable property="pid">
+		        <isNotNull property="pid" prepend="and">  
+		            tags.entity_id=#pid#
+		        </isNotNull>
+	        </isPropertyAvailable>
+			
+	  	</dynamic>
+		
+		</select>
+		<select id="selectALlUrlForPage" resultMap="UrlAliasResultMap">
+			SELECT source,alias FROM devel_url_alias WHERE source like 'invpage/%' 
+        </select> 
+        
+        <select id="selectUrlBySource" resultMap="UrlAliasResultMap" parameterClass="map">
+			SELECT source,alias FROM devel_url_alias WHERE source = #source#
+        </select> 
+        
+         <select id="selectWeb_tool_settings" resultMap="WebToolSettingsMap" parameterClass="map">
+			SELECT id,url_alias,settings,status FROM devel_web_tools_config WHERE status = 1
+        </select> 
+        
+        <select id="selectSynDate" resultMap="SynDateMap" parameterClass="map">
+			 SELECT n.nid,n.vid,MAX(revision.timestamp) AS synDate
+				FROM devel_node n 
+				INNER JOIN devel_auto_republish_url_trace trace ON trace.nid=n.nid AND trace.type=3  
+				LEFT JOIN devel_node_revision revision ON revision.nid = n.nid AND revision.vid = n.vid 
+			 WHERE n.status =1 AND (n.type = 'invcontent' OR n.type = 'invcontent_child' ) AND revision.timestamp IS NOT NULL 
+			 <dynamic >
+				<isPropertyAvailable property="nid">
+			        <isNotNull property="nid" prepend="AND">  
+			          n.nid = #nid#
+			        </isNotNull>
+		        </isPropertyAvailable>
+	  		</dynamic>
+	  		<dynamic >
+				<isPropertyAvailable property="vid">
+			        <isNotNull property="vid" prepend="AND">  
+			          n.vid = #vid#
+			        </isNotNull>
+		        </isPropertyAvailable>
+	  		</dynamic>
+			 GROUP BY nid,vid
+        </select> 
+        
+        <select id="selectRelated" resultMap="RelatedMap" parameterClass="map">
+			 SELECT n.`nid`,n.`vid`,related.`field_related_content_entities_target_id` as related_nid FROM devel_field_revision_field_related_content_entities AS related
+		JOIN devel_node AS n ON  related.`entity_id`=n.`nid`  AND  related.`revision_id`= n.`vid`
+		WHERE  n.`status`=1 AND related.`deleted`=0 AND related.`entity_type`='node' 
+		 <dynamic >
+				<isPropertyAvailable property="nid">
+			        <isNotNull property="nid" prepend="AND">  
+			          n.nid = #nid#
+			        </isNotNull>
+		        </isPropertyAvailable>
+	  		</dynamic>
+	  		<dynamic >
+				<isPropertyAvailable property="vid">
+			        <isNotNull property="vid" prepend="AND">  
+			          n.vid = #vid#
+			        </isNotNull>
+		        </isPropertyAvailable>
+	  		</dynamic>
+        </select> 
+      
+		 
+</sqlMap>

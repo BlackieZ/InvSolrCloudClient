@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
+        xmlns:context="http://www.springframework.org/schema/context"
+        xmlns:aop="http://www.springframework.org/schema/aop" xmlns:tx="http://www.springframework.org/schema/tx"
+        xmlns:hz="http://www.hazelcast.com/schema/spring"
+        xsi:schemaLocation="http://www.springframework.org/schema/beans
+      http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+      http://www.springframework.org/schema/context
+      http://www.springframework.org/schema/context/spring-context-3.0.xsd
+      http://www.springframework.org/schema/tx
+      http://www.springframework.org/schema/tx/spring-tx-3.0.xsd
+      http://www.springframework.org/schema/aop
+      http://www.springframework.org/schema/aop/spring-aop-3.0.xsd
+      http://www.hazelcast.com/schema/spring
+      http://www.hazelcast.com/schema/spring/hazelcast-spring-2.3.xsd">
+      
+    <import resource="applicationContext-base.xml"/>
+
+        <!--  bean id="ReLoadServiceJob" class="com.valueclickbrands.search.service.impl.ReLoadDataTask">
+            <property name="indexService" ref="IndexService" />
+            <property name="searchService" ref="SearchService" />
+            <property name="dumpService" ref="DumpService" />
+            <property name="indexPathList">
+                <list>
+                    <value>${index_path_1}</value>
+                    <value>${index_path_2}</value>
+                </list>
+            </property>
+            <property name="dumpPathList">
+                <list>
+                    <value>${dump_path_1}</value>
+                    <value>${dump_path_2}</value>
+                </list>
+            </property>
+            <property name="cache" ref="CacheUtil" />
+        </bean>
+        <bean id="ReLoadServiceJobDetail" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+                <property name="targetObject" ref="ReLoadServiceJob" />
+                <property name="targetMethod" value="run" />
+        </bean>
+        <bean id="ReLoadServiceJobDetailTrigger" class="org.springframework.scheduling.quartz.CronTriggerBean">
+                <property name="jobDetail" ref="ReLoadServiceJobDetail" />
+                <property name="cronExpression" value="0 0 0 * * ?" />
+        </bean>
+        -->
+	<bean id="pollingMonitorZkQueueJob" class="com.valueclickbrands.solr.job.PollingMonitorZkQueue">
+		<property name="serviceMain" ref="serviceMain" />
+	</bean>
+	
+	<bean id="pollingMonitorZkQueueJobDetail"
+		class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+		<property name="targetObject" ref="pollingMonitorZkQueueJob" />
+		<property name="targetMethod" value="execute" />
+	</bean>
+	<bean id="pollingMonitorZkQueueJobDetailTrigger" class="org.springframework.scheduling.quartz.CronTriggerBean">
+		<property name="jobDetail" ref="pollingMonitorZkQueueJobDetail" />
+		<property name="cronExpression" value="${quartz.time.polling_monitor_zkqueue}" />
+	</bean>
+	
+	<bean id="LoadJob" class="com.valueclickbrands.solr.job.LoadJob"  init-method="execute">
+		<property name="taxonomyService" ref="TaxonomyService" />
+	</bean>
+	<bean id="LoadJobDetail" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+		<property name="targetObject" ref="LoadJob" />
+		<property name="targetMethod" value="execute" />
+	</bean>
+	<bean id="LoadJobTrigger" class="org.springframework.scheduling.quartz.CronTriggerBean">
+		<property name="jobDetail" ref="LoadJobDetail" />
+		<property name="cronExpression" value="${quartz.time.load_job}" />
+	</bean>
+	
+	
+	<bean id="IndexFullyJob" class="com.valueclickbrands.solr.job.IndexFullyJob">
+		<property name="zkService" ref="zkService" />
+		<property name="taskService" ref="taskService" />
+	</bean>
+	<bean id="IndexFullyJobDetail" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+		<property name="targetObject" ref="IndexFullyJob" />
+		<property name="targetMethod" value="execute" />
+	</bean>
+	<bean id="IndexFullyJobTrigger" class="org.springframework.scheduling.quartz.CronTriggerBean">
+		<property name="jobDetail" ref="IndexFullyJobDetail" />
+		<property name="cronExpression" value="${quartz.time.index_fully_job}" />
+	</bean>
+	
+	<bean class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
+		<property name="triggers">
+			<list>
+				<ref bean="pollingMonitorZkQueueJobDetailTrigger" />
+				<ref bean="LoadJobTrigger" />
+				<ref bean="IndexFullyJobTrigger" />
+			</list>
+		</property>
+	</bean>
+</beans>
